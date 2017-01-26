@@ -2,4 +2,10 @@
   token-exchange works!
 </p>
 
-code: {{code}}
+code: {{code}} acccessToken: {{accessToken | async}}
+
+<button (click)="getActivities()">Get Activities!</button>
+
+<br />
+
+activities: {{activities | async}}

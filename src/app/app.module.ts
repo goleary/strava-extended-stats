@@ -1,14 +1,16 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
+import { JsonpModule, HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { StravaAuthComponent } from './strava-auth/strava-auth.component';
 import { TestComponent } from './test/test.component';
 import { TokenExchangeComponent } from './token-exchange/token-exchange.component';
+import { StravaApiService } from './strava-api.service';
 
 
 @NgModule({
@@ -20,6 +22,7 @@ import { TokenExchangeComponent } from './token-exchange/token-exchange.componen
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     FormsModule,
     MaterialModule,
     RouterModule.forRoot([
@@ -36,9 +39,10 @@ import { TokenExchangeComponent } from './token-exchange/token-exchange.componen
         component: TokenExchangeComponent
       }
     ]),
+    JsonpModule,
     HttpModule
   ],
-  providers: [],
+  providers: [StravaApiService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
