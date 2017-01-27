@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
+import { Http, URLSearchParams } from '@angular/http';
+import { Storage } from '@ionic/storage';
 
-import { Jsonp, Headers, Http, URLSearchParams } from '@angular/http';
-
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/do';
 
 declare var fetch: (...any) => Promise<any>;
@@ -21,10 +24,14 @@ export class StravaApiService {
   }
   localAuthUrl: string = this.localBaseUrl + 'tokenexchange';
 
-  accessToken: Promise<string>;
+  private _accessToken: string = null;
+  private accessTokenStorageKey: string = 'access_token';
 
-  constructor(private jsonp: Jsonp, private http: Http) { }
+  constructor(
+    private http: Http,
+    public storage: Storage) { }
 
+  //initiates strava authenticatio workflow
   gotoStravaAuthUrl() {
     window.location.href = 'https://www.strava.com/oauth/authorize?' +
       'client_id=' + this.client_id +
@@ -32,13 +39,34 @@ export class StravaApiService {
       '&redirect_uri=http://localhost:4200/token-exchange';
   }
 
-  getAccessToken(code: string) {
+  private get accessToken() {
+    return this._accessToken;
+  }
+
+  private set accessToken(accessToken: string) {
+    this._accessToken = accessToken;
+    this.storage.set(this.accessTokenStorageKey, accessToken);
+  }
+
+  private getAccessToken(code: string) {
+    if (this.accessToken) {
+      return Promise.resolve(this.accessToken);
+    }
+    else {
+      return this.storage.get(this.accessTokenStorageKey);
+    }
+  }
+  // to be called when strava authentication redirects back to app
+  exchangeToken(code: string) {
     let data = new URLSearchParams();
     data.append('token', code);
     return this.http.post(this.localAuthUrl, data)
       .map(response => response.json()['access_token'])
       .do(accessToken => this.accessToken = accessToken);
   }
+
+
+  // below this could use continued refactoring
 
   getApiPath(api: string): Promise<string> {
     if (this.apiPath.hasOwnProperty(api)) {
@@ -49,19 +77,20 @@ export class StravaApiService {
     }
   }
 
-  getActivities() {
-    return this.getApiResponse('activities');
+  getActivities(before?: number, after?: number) {
+    return this.getApiResponse('activities').map(response => response.json());
   }
 
   getApiResponse(api: string) {
-    return Promise.all([this.accessToken, this.getApiPath(api)])
-      .then(result => this.generateApiCall(result));
+    return Observable.forkJoin([Promise.resolve(this.accessToken), this.getApiPath(api)])
+      .mergeMap(result => this.generateApiCall(result))
   }
   //Takes array with access token first and url path second
   generateApiCall(info: string[]) {
-    let url = info[1] + '?access_token=' + info[0];
-    // let data = new URLSearchParams();
-    // data.append('access_token', info[0]);
+    let date = new Date('1-1-2017');
+    let url = info[1] + '?access_token=' + info[0]
+      //+ '&after=' + date.getTime().toString()
+      + '&per_page=200';
     return this.http.get(url);
   }
 

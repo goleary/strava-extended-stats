@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 
+import { ActivityService } from '../activity.service';
 import { StravaApiService } from '../strava-api.service';
 
 @Component({
@@ -11,11 +12,8 @@ import { StravaApiService } from '../strava-api.service';
   styleUrls: ['./token-exchange.component.css']
 })
 export class TokenExchangeComponent implements OnInit {
-  code: string;
-  accessToken: Observable<string>;
-  activities: Observable<any>;
-
   constructor(
+    private router: Router,
     private route: ActivatedRoute,
     private stravaApiService: StravaApiService
   ) {
@@ -23,15 +21,15 @@ export class TokenExchangeComponent implements OnInit {
 
   ngOnInit() {
     this.getCodeFromRoute(this.route)
-      .then(code => this.code = code)
-      .then(() => this.accessToken = this.stravaApiService.getAccessToken(this.code));
+      .then(code => this.stravaApiService.exchangeToken(code))
+      .then(() =>this.gotoDataView());
   }
   getCodeFromRoute(route: ActivatedRoute) {
     return Promise.resolve(route.snapshot.queryParams['code']);
   }
 
-  getActivities() {
-    this.stravaApiService.getActivities().then(result => this.activities = result);
+  gotoDataView() {
+    this.router.navigate(['dashboard']);
   }
 
 }

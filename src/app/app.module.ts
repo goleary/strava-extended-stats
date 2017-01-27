@@ -6,19 +6,26 @@ import { RouterModule } from '@angular/router';
 import { JsonpModule, HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
 
+import { Storage } from '@ionic/storage';
+
 import { AppComponent } from './app.component';
 import { StravaAuthComponent } from './strava-auth/strava-auth.component';
 import { TestComponent } from './test/test.component';
 import { TokenExchangeComponent } from './token-exchange/token-exchange.component';
 import { StravaApiService } from './strava-api.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
+export function provideStorage() {
+ return new Storage();
+}
 
 @NgModule({
   declarations: [
     AppComponent,
     StravaAuthComponent,
     TestComponent,
-    TokenExchangeComponent
+    TokenExchangeComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -37,12 +44,19 @@ import { StravaApiService } from './strava-api.service';
       {
         path: 'token-exchange',
         component: TokenExchangeComponent
+      },
+      {
+        path: 'dashboard',
+        component: DashboardComponent
       }
     ]),
     JsonpModule,
     HttpModule
   ],
-  providers: [StravaApiService],
+  providers: [
+    { provide: Storage, useFactory: provideStorage },
+    StravaApiService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
