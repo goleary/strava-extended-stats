@@ -13,6 +13,7 @@ export class StravaApiService {
   client_id: string = '15701';
   baseUrl: string = 'https://www.strava.com/';
   localBaseUrl: string = 'http://localhost:3100/';
+  localStravaBaseUrl: string = this.localBaseUrl + 'strava/';
   apiPath: Object = {
     activities: "api/v3/athlete/activities",
     auth: 'oath/authorize',
@@ -41,7 +42,7 @@ export class StravaApiService {
 
   getApiPath(api: string): Promise<string> {
     if (this.apiPath.hasOwnProperty(api)) {
-      return Promise.resolve(this.localBaseUrl + this.apiPath[api]);
+      return Promise.resolve(this.localStravaBaseUrl + this.apiPath[api]);
     }
     else {
       return Promise.reject('Unkown Strava API path for ' + api);
@@ -58,10 +59,10 @@ export class StravaApiService {
   }
   //Takes array with access token first and url path second
   generateApiCall(info: string[]) {
-    let url = info[1];
-    let data = new URLSearchParams();
-    data.append('access_token', info[0]);
-    return this.jsonp.get(url, data);
+    let url = info[1] + '?access_token=' + info[0];
+    // let data = new URLSearchParams();
+    // data.append('access_token', info[0]);
+    return this.http.get(url);
   }
 
 
