@@ -6,6 +6,7 @@ import { Activity } from './shared/activity.model';
 
 @Injectable()
 export class ActivityService {
+  private storageKeyPrefix = 'activity_';
   _activities: Activity[];
   constructor(
     public storage: Storage,
@@ -16,11 +17,16 @@ export class ActivityService {
 
   set activities(activities: Activity[]) {
     this._activities = activities;
-    activities.forEach(a => this.storage.set(a.id.toString(), a))
+    activities.forEach(a => this.storage.set(this.getActivityStorageKey(a), a))
   }
 
   getActivities() {
     return this.stravaApiService.getActivities()
-      .do(result => this.activities = result);
+      .map(result => <Activity[]>result)
+      .do(activities => this.activities = activities);
+  }
+
+  getActivityStorageKey(activity: Activity) {
+    return this.storageKeyPrefix + activity.id.toString();
   }
 }

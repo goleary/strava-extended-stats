@@ -15,8 +15,10 @@ import { TokenExchangeComponent } from './token-exchange/token-exchange.componen
 import { StravaApiService } from './strava-api.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
+import { ActivityService } from './activity.service';
+
 export function provideStorage() {
- return new Storage();
+  return new Storage();
 }
 
 @NgModule({
@@ -54,6 +56,7 @@ export function provideStorage() {
     HttpModule
   ],
   providers: [
+    ActivityService,
     { provide: Storage, useFactory: provideStorage },
     StravaApiService
   ],

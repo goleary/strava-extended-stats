@@ -24,12 +24,30 @@ export class StravaApiService {
   }
   localAuthUrl: string = this.localBaseUrl + 'tokenexchange';
 
+  //private _accessToken: string = null;
+  // creates unresolved Promise
   private _accessToken: string = null;
   private accessTokenStorageKey: string = 'access_token';
 
   constructor(
     private http: Http,
-    public storage: Storage) { }
+    public storage: Storage) {
+
+  }
+
+  init() {
+    this.storage.get(this.accessTokenStorageKey).then(result => {
+      if (result) {
+        this._accessToken = result;
+      } else {
+        this.gotoStravaAuthUrl();
+      }
+    });;
+  }
+
+  loggedIn() {
+    return this._accessToken != null;
+  }
 
   //initiates strava authenticatio workflow
   gotoStravaAuthUrl() {
@@ -37,9 +55,10 @@ export class StravaApiService {
       'client_id=' + this.client_id +
       '&response_type=code' +
       '&redirect_uri=http://localhost:4200/token-exchange';
+    return Promise.resolve('never hit');
   }
 
-  private get accessToken() {
+  getAaccessToken() {
     return this._accessToken;
   }
 
@@ -48,21 +67,29 @@ export class StravaApiService {
     this.storage.set(this.accessTokenStorageKey, accessToken);
   }
 
-  private getAccessToken(code: string) {
-    if (this.accessToken) {
-      return Promise.resolve(this.accessToken);
+  private getAccessToken() {
+    if (this._accessToken) {
+      return Promise.resolve(this._accessToken);
     }
     else {
-      return this.storage.get(this.accessTokenStorageKey);
+      this.gotoStravaAuthUrl();
+      return Promise.reject('not logged in');
     }
   }
   // to be called when strava authentication redirects back to app
   exchangeToken(code: string) {
+    console.log('exchange code: ', code, ' for token');
     let data = new URLSearchParams();
     data.append('token', code);
-    return this.http.post(this.localAuthUrl, data)
-      .map(response => response.json()['access_token'])
-      .do(accessToken => this.accessToken = accessToken);
+    return new Promise((resolve, reject) => {
+      this.http.post(this.localAuthUrl, data)
+        .map(response => response.json()['access_token'])
+        .subscribe(accessToken => {
+          console.log('setting accesssToken : ', accessToken)
+          this._accessToken = accessToken;
+          resolve();
+        })
+    });
   }
 
 
@@ -78,12 +105,12 @@ export class StravaApiService {
   }
 
   getActivities(before?: number, after?: number) {
-    return this.getApiResponse('activities').map(response => response.json());
+    return this.getApiResponse('activities').map((response: any) => response.json());
   }
 
   getApiResponse(api: string) {
-    return Observable.forkJoin([Promise.resolve(this.accessToken), this.getApiPath(api)])
-      .mergeMap(result => this.generateApiCall(result))
+    return Observable.forkJoin([this.getAccessToken(), this.getApiPath(api)])
+      .mergeMap(result => this.generateApiCall(result));
   }
   //Takes array with access token first and url path second
   generateApiCall(info: string[]) {
