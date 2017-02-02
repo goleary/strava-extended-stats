@@ -120,6 +120,4 @@ export class StravaApiService {
       + '&per_page=200';
     return this.http.get(url);
   }
-
-
 }

@@ -1,4 +1,9 @@
+import _ from 'lodash';
+
 export class Activity {
+  constructor(jsonData: any) {
+    _.extend(this, jsonData);
+  }
   id: number; //integer;
   resource_state: number;
   external_id: string;
@@ -18,6 +23,9 @@ export class Activity {
   type: string; //activity type, ie. ride, run, swim, etc.
   start_date: string; // string;
   start_date_local: string; // string
+  get startDateLocal() {
+    return new Date(this.start_date_local);
+  }
   timezone: string;
   start_latlng: number[]; //[latitude, longitude];
   end_latlng: number[]; //[latitude, longitude];

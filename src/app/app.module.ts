@@ -4,9 +4,12 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { JsonpModule, HttpModule } from '@angular/http';
-import { MaterialModule } from '@angular/material';
+import { MaterialModule, MdIconRegistry } from '@angular/material';
 
 import { Storage } from '@ionic/storage';
+
+import { ChartModule } from 'angular2-highcharts';
+
 
 import { AppComponent } from './app.component';
 import { StravaAuthComponent } from './strava-auth/strava-auth.component';
@@ -31,9 +34,10 @@ export function provideStorage() {
   ],
   imports: [
     BrowserModule,
+    ChartModule,
     CommonModule,
     FormsModule,
-    MaterialModule,
+    MaterialModule.forRoot(),
     RouterModule.forRoot([
       {
         path: 'test',

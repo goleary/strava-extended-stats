@@ -1,9 +1,9 @@
-<h1>
-  {{title}}
-</h1>
-<a routerLink="/test">Test</a>
-<a routerLink="/auth">Auth</a>
-<a routerLink="/dashboard">Dashboard</a>
+<md-toolbar color="primary">
+  <a routerLink="/test" md-button>{{title}}</a>
+  <a routerLink="/auth" md-button>Auth</a>
+  <a routerLink="/dashboard" md-button>Dashboard</a>
+</md-toolbar>
+
 
 <router-outlet></router-outlet>
 <!--<button md-button>Connect Strava</button>-->
