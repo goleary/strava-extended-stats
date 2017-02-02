@@ -3,6 +3,15 @@
 </p>
 <!--<button (click)="getActivities()"> Get Activities </button>-->
 
+<canvas baseChart width="400" height="400"
+                [datasets]="lineChartData"
+                [labels]="lineChartLabels"
+                [options]="lineChartOptions"
+                [colors]="lineChartColors"
+                [legend]="lineChartLegend"
+                [chartType]="lineChartType"
+                (chartHover)="chartHovered($event)"
+                (chartClick)="chartClicked($event)"></canvas>
 Activities:
 
-<p *ngFor="let activity of activities">{{activity.name}}</p>
+<!--<p *ngFor="let activity of activities">{{activity.name}}</p>-->

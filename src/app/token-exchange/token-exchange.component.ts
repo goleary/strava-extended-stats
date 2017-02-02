@@ -22,13 +22,13 @@ export class TokenExchangeComponent implements OnInit {
   ngOnInit() {
     this.getCodeFromRoute(this.route)
       .then(code => this.stravaApiService.exchangeToken(code))
-      .then(() =>this.gotoDataView());
+      .then(() =>this.gotoDashboard());
   }
   getCodeFromRoute(route: ActivatedRoute) {
     return Promise.resolve(route.snapshot.queryParams['code']);
   }
 
-  gotoDataView() {
+  gotoDashboard() {
     this.router.navigate(['dashboard']);
   }
 

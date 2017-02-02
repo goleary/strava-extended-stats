@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { JsonpModule, HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
+import { ChartsModule } from 'ng2-charts';
 
 import { Storage } from '@ionic/storage';
 
@@ -31,6 +32,7 @@ export function provideStorage() {
   ],
   imports: [
     BrowserModule,
+    ChartsModule,
     CommonModule,
     FormsModule,
     MaterialModule,
