@@ -1,30 +1,45 @@
-<!--
-<md-menu #menu="mdMenu">
-  <button md-menu-item>
-    <md-icon> dialpad </md-icon>
-    <span> Redial </span>
-  </button>
-  <button md-menu-item disabled>
-    <md-icon> voicemail </md-icon>
-    <span> Check voicemail </span>
-  </button>
-  <button md-menu-item>
-    <md-icon> notifications_off </md-icon>
-    <span> Disable alerts </span>
-  </button>
-</md-menu>
--->
 <md-card>
-  <md-tab-group>
-    <md-tab label="2015">
-      <chart [options]="activityOptions"></chart>
-    </md-tab>
-    <md-tab label="2016">
-      <chart [options]="activityOptions"></chart>
-    </md-tab>
-    <md-tab label="2017">
-      <chart [options]="activityOptions"></chart>
-    </md-tab>
-  </md-tab-group>
+  <md-sidenav-container>
+    <md-sidenav #sidenav mode='side' [opened]='true'>
+
+      <md-list>
+        <h3 md-subheader>Settings</h3>
+        <md-list-item>
+          <md-select [(ngModel)]="units" placeholder="Units">
+            <md-option *ngFor="let unit of units" [value]="unit">{{ unit }}</md-option>
+          </md-select>
+        </md-list-item>
+        <md-list-item>
+          <md-select [(ngModel)]="year" placeholder="Year">
+            <md-option *ngFor="let year of years" [value]="year">{{ year }}</md-option>
+          </md-select>
+        </md-list-item>
+        <md-list-item>
+          <md-select [(ngModel)]="metric" placeholder="Metric">
+            <md-option *ngFor="let metric of metrics" [value]="metric">{{ metric }}</md-option>
+          </md-select>
+        </md-list-item>
+        <h3 md-subheader>Activity Types</h3>
+        <md-list-item>
+          <md-slide-toggle [(ngModel)]='allActivityTypesSelected'>All</md-slide-toggle>
+        </md-list-item>
+        <md-list-item *ngFor='let activity of activityTypes'>
+          <md-slide-toggle [checked]='isActivityTypeSelected(activity)' (change)='selectActivityType(activity)'>{{activity}}</md-slide-toggle>
+        </md-list-item>
+      </md-list>
+    </md-sidenav>
+    <!-- primary content -->
+    <md-tab-group>
+      <md-tab label="2015">
+        <chart [options]="activityOptions"></chart>
+      </md-tab>
+      <md-tab label="2016">
+        <chart [options]="activityOptions2016"></chart>
+      </md-tab>
+      <md-tab label="2017">
+        <chart [options]="activityOptions2017"></chart>
+      </md-tab>
+    </md-tab-group>
+  </md-sidenav-container>
 </md-card>
-<button (click)="setActivityOptions()"> Get Activities </button>
+<button (click)="getActivityOptions()"> Get Activities </button>

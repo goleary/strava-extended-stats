@@ -25,23 +25,28 @@ export class ActivityService {
     return this._activities;
   }
 
-  getActivities() {
-    return this.stravaApiService.getActivities()
+  getActivities(): Promise<Activity[]> {
+    // need to add error handling
+    return new Promise((resolve, reject) => this.stravaApiService.getActivities()
       .map(result => _.map(result, a => new Activity(a)))
-      .do(activities => this.activities = activities);
+      .do(activities => this.activities = activities)
+      .subscribe(activities => resolve(activities)));
   }
 
   getActivityStorageKey(activity: Activity) {
     return this.storageKeyPrefix + activity.id.toString();
   }
 
-  getData(attribute: string, time_period: string, start?: Date, end?: Date) {
+  getData(attribute: string, time_period: string, start?: Date, end?: Date, activityTypes?: string[]) {
     let filtered = _.filter(this.activities, (a: Activity) => {
-      if (_.isNil(start) === false && a.startDateLocal < start) {
+      if (!_.isNil(start) && a.startDateLocal < start) {
         return false;
       }
-      else if (_.isNil(end) === false && a.startDateLocal > end) {
+      else if (!_.isNil(end) && a.startDateLocal > end) {
         return false
+      }
+      if (!_.isNil(activityTypes) && !_.includes(activityTypes, a.type)) {
+        return false;
       }
       else return true;
     });
@@ -50,6 +55,7 @@ export class ActivityService {
         case 'day':
           return a.startDateLocal.getDate();
         case 'week':
+          // todo
           break;
         case 'month':
           return a.startDateLocal.getMonth();
@@ -59,7 +65,15 @@ export class ActivityService {
     return data;
   }
 
-  getElevationByMonth() {
-    return this.getData('total_elevation_gain', 'month');
+  getMetricByMonthForYear(metric: string, year: number, activityTypes?: string[]) {
+    let from = year ? new Date(year, 0, 1) : undefined;
+    let to = year ? new Date(year + 1, 0, 1) : undefined;
+    return this.getData(metric, 'month', from, to, activityTypes);
+  }
+
+  getElevationByMonthForYear(year?: number) {
+    let from = year ? new Date(year, 0, 1) : undefined;
+    let to = year ? new Date(year + 1, 0, 1) : undefined;
+    return this.getData('total_elevation_gain', 'month', from, to);
   }
 }
