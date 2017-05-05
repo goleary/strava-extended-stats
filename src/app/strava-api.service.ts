@@ -14,15 +14,16 @@ declare var fetch: (...any) => Promise<any>;
 export class StravaApiService {
 
   client_id: string = '15701';
-  baseUrl: string = 'https://www.strava.com/';
-  localBaseUrl: string = 'http://localhost:3100/';
-  localStravaBaseUrl: string = this.localBaseUrl + 'strava/';
+  baseUrl: string = 'https://strava-api-proxy.azurewebsites.net/strava/';
+  //localBaseUrl: string = 'http://localhost:3100/';
+  //localStravaBaseUrl: string = this.localBaseUrl + 'strava/';
   apiPath: Object = {
     activities: "api/v3/athlete/activities",
     auth: 'oath/authorize',
     tokenExchange: "oauth/token"
   }
-  localAuthUrl: string = this.localBaseUrl + 'tokenexchange';
+  authUrl: string = this.baseUrl + 'tokenexchange';
+  //localAuthUrl: string = this.localBaseUrl + 'tokenexchange';
 
   //private _accessToken: string = null;
   // creates unresolved Promise
@@ -82,7 +83,7 @@ export class StravaApiService {
     let data = new URLSearchParams();
     data.append('token', code);
     return new Promise((resolve, reject) => {
-      this.http.post(this.localAuthUrl, data)
+      this.http.post(this.authUrl, data)
         .map(response => response.json()['access_token'])
         .subscribe(accessToken => {
           console.log('setting accesssToken : ', accessToken)
@@ -97,7 +98,7 @@ export class StravaApiService {
 
   getApiPath(api: string): Promise<string> {
     if (this.apiPath.hasOwnProperty(api)) {
-      return Promise.resolve(this.localStravaBaseUrl + this.apiPath[api]);
+      return Promise.resolve(this.baseUrl + this.apiPath[api]);
     }
     else {
       return Promise.reject('Unkown Strava API path for ' + api);
